@@ -1,0 +1,1115 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Moodmusic – Support Telefon-Skript</title>
+  <style>
+    :root{
+      --bg:#07150f;
+      --muted:#a7c8ba;
+      --text:#eaf7f1;
+      --card:#0b1f16;
+      --accent:#3bbf7a;
+      --accent2:#7cf0c0;
+      --danger:#ff6b6b;
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 18px 40px rgba(0,0,0,.35);
+      --radius: 16px;
+      --pad: 18px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--font);
+      background:
+        radial-gradient(1200px 700px at 12% 8%, rgba(59,191,122,.25), transparent 55%),
+        radial-gradient(900px 600px at 88% 18%, rgba(124,240,192,.16), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      padding: 22px;
+      font-size: 18px;
+    }
+    .wrap{
+      width: min(1050px, 100%);
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    header{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      padding: 8px 6px;
+    }
+
+    /* BIG LOGO (reliable) */
+    .logoFull{
+      width: 100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      margin-top: 6px;
+      margin-bottom: 6px;
+    }
+    .logoFull img{
+      width: min(720px, 96%);
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 25px rgba(0,0,0,.25));
+    }
+    .logoError{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,107,107,.55);
+      background: rgba(255,107,107,.12);
+      color:#ffd7d7;
+      font-size:14px;
+      display:none;
+      max-width: min(720px, 96%);
+      line-height:1.35;
+    }
+
+    .headRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap: 2px;
+    }
+    .brand h1{
+      margin:0;
+      font-size: 24px;
+      letter-spacing:.2px;
+      color: var(--text);
+    }
+    .brand p{
+      margin:0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .progress{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 14px;
+      backdrop-filter: blur(6px);
+    }
+    .pill.active{
+      color: var(--text);
+      border-color: rgba(59,191,122,.55);
+      background: rgba(59,191,122,.14);
+    }
+    .pill.done{
+      color: var(--text);
+      border-color: rgba(124,240,192,.45);
+      background: rgba(124,240,192,.10);
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: var(--pad);
+    }
+
+    .toprow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin: 0 0 10px;
+      width:100%;
+    }
+    .section-title h2{
+      margin:0;
+      font-size: 20px;
+      letter-spacing:.2px;
+    }
+    .tag{
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: rgba(255,255,255,.03);
+      white-space: nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+    .col-12{ grid-column: span 12; }
+    .col-6{ grid-column: span 6; }
+
+    label{
+      display:block;
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input, select, textarea{
+      width:100%;
+      padding: 14px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+      font-size: 18px;
+    }
+    textarea{ min-height: 130px; resize: vertical; }
+    input::placeholder, textarea::placeholder{ color: rgba(167,200,186,.55); }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(59,191,122,.70);
+      box-shadow: 0 0 0 3px rgba(59,191,122,.18);
+    }
+
+    .hint{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-top: 14px;
+    }
+    .btns{ display:flex; gap: 10px; flex-wrap:wrap; }
+
+    button{
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.1px;
+      transition: transform .06s ease, border-color .08s ease, background .08s ease;
+      font-size: 16px;
+    }
+    button:hover{ transform: translateY(-1px); }
+    button.primary{
+      border-color: rgba(59,191,122,.65);
+      background: rgba(59,191,122,.18);
+    }
+    button.success{
+      border-color: rgba(124,240,192,.60);
+      background: rgba(124,240,192,.14);
+    }
+    button.danger{
+      border-color: rgba(255,107,107,.55);
+      background: rgba(255,107,107,.12);
+    }
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .hidden{ display:none !important; }
+
+    .choice-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .choice{
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.14);
+      border-radius: 14px;
+      padding: 14px;
+      cursor:pointer;
+      transition: transform .08s ease, border-color .08s ease, background .08s ease;
+      user-select:none;
+    }
+    .choice:hover{
+      transform: translateY(-1px);
+      border-color: rgba(59,191,122,.40);
+      background: rgba(59,191,122,.10);
+    }
+    .choice.active{
+      border-color: rgba(124,240,192,.60);
+      background: rgba(124,240,192,.12);
+    }
+    .choice b{ display:block; margin-bottom: 6px; font-size: 18px; }
+    .choice span{ color: var(--muted); font-size: 14px; line-height: 1.35; }
+
+    .qa{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255,255,255,.03);
+      margin-top: 10px;
+    }
+    .qa h3{ margin: 0 0 8px; font-size: 16px; color: var(--text); }
+
+    .qline{
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,.14);
+      background: rgba(0,0,0,.14);
+    }
+    .qline .q{
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    /* Summary (answers bold on screen) */
+    .summaryBox{
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.22);
+      margin: 10px 0 0;
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 16px;
+    }
+    .summaryBox .line{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:baseline;
+      padding: 3px 0;
+      border-bottom: 1px dashed rgba(255,255,255,.08);
+    }
+    .summaryBox .line:last-child{ border-bottom:none; }
+    .summaryBox .k{ color: var(--muted); }
+    .summaryBox .v{ font-weight: 800; }
+    .summaryBox h4{
+      margin: 10px 0 6px;
+      font-size: 16px;
+      color: var(--text);
+    }
+    .summaryBox .block{ margin-top: 8px; padding-top: 6px; }
+
+    @media (max-width: 740px){
+      .col-6{ grid-column: span 12; }
+      .logoFull img{ width: min(640px, 96%); }
+      body{ font-size: 17px; }
+      input, select, textarea{ font-size: 17px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logoFull">
+        <img
+          id="brandLogo"
+          src="./Logo-Cmyk@4x.png"
+          alt="Moodmusic Logo"
+          loading="eager"
+          decoding="async"
+          onerror="this.style.display='none'; document.getElementById('logoError').style.display='block';"
+        >
+        <div id="logoError" class="logoError">
+          ❌ Logo nicht gefunden. Lege bitte die Datei <b>Logo-Cmyk@4x.png</b> in den gleichen Ordner wie diese HTML-Datei.
+          Achte auf exakte Schreibweise (Groß-/Kleinschreibung).
+        </div>
+      </div>
+
+      <div class="headRow">
+        <div class="brand">
+          <h1>Support Telefon-Skript</h1>
+          <p>Basisdaten → Anliegen → Fragen/Notizen → Zusammenfassung (Kopieren / Mail / vCard)</p>
+        </div>
+
+        <div class="progress" id="progress">
+          <span class="pill active" data-step="1">1 · Basisdaten</span>
+          <span class="pill" data-step="2">2 · Anliegen</span>
+          <span class="pill" data-step="3">3 · Abschluss</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- STEP 1 -->
+    <section class="card" id="step1">
+      <div class="toprow">
+        <div class="section-title">
+          <h2>1) Basisdaten erfassen</h2>
+          <span class="tag">Optional – kann übersprungen werden</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-6">
+          <label for="callerName">Mit wem spreche ich?</label>
+          <input id="callerName" placeholder="Vor- und Nachname" autocomplete="name" />
+        </div>
+        <div class="col-6">
+          <label for="company">Von welcher Firma?</label>
+          <input id="company" placeholder="Firmenname" autocomplete="organization" />
+        </div>
+
+        <div class="col-6">
+          <label for="phone">Telefonnummer</label>
+          <input id="phone" placeholder="+49 …" autocomplete="tel" />
+        </div>
+        <div class="col-6">
+          <label for="email">E-Mail</label>
+          <input id="email" placeholder="name@firma.de" autocomplete="email" />
+        </div>
+
+        <div class="col-6">
+          <label for="position">Position der Person</label>
+          <input id="position" placeholder="z. B. Inhaber, Filialleiter, Mitarbeiter" />
+        </div>
+        <div class="col-6">
+          <label for="site">Standort / Filiale (falls relevant)</label>
+          <input id="site" placeholder="z. B. Berlin Mitte" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="hint">Hinweis: Gespeichert wird beim Klick auf „Weiter“ (und am Ende auch).</div>
+        <div class="btns">
+          <button class="danger" type="button" id="newCall1">Neuer Anruf</button>
+          <button type="button" id="skipTo2">Überspringen →</button>
+          <button type="button" id="skipTo3">Nur Kontakt (vCard) →</button>
+          <button class="primary" type="button" id="toStep2">Weiter →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="card hidden" id="step2">
+      <div class="toprow">
+        <div class="section-title">
+          <h2>2) Anliegen auswählen</h2>
+          <span class="tag">Autosave beim „Weiter“</span>
+        </div>
+      </div>
+
+      <div class="choice-grid" id="categoryGrid">
+        <div class="choice" data-cat="A">
+          <b>A) Technisches Problem</b>
+          <span>Gerät/Player, Internet, Ausfall, Login, Störung</span>
+        </div>
+        <div class="choice" data-cat="B">
+          <b>B) Rechnung / Vertrag / Abrechnung</b>
+          <span>Rechnung, Mahnung, Vertrag, Daten</span>
+        </div>
+        <div class="choice" data-cat="C">
+          <b>C) Produkt / Musik / Playlist</b>
+          <span>Genre, Lautstärke, Musikwünsche</span>
+        </div>
+        <div class="choice" data-cat="D">
+          <b>D) Mit bestimmter Person sprechen</b>
+          <span>Weiterleitung, Rückruf, Dringlichkeit</span>
+        </div>
+        <div class="choice" data-cat="E">
+          <b>E) Sonstiges / unklar</b>
+          <span>Anliegen konkretisieren</span>
+        </div>
+      </div>
+
+      <div class="qa" id="qaBox" aria-live="polite">
+        <h3>Fragenleitfaden (dynamisch)</h3>
+        <div class="hint">Wähle oben eine Kategorie.</div>
+      </div>
+
+      <div class="row">
+        <div class="btns">
+          <button type="button" id="backTo1">← Zurück</button>
+        </div>
+        <div class="btns">
+          <button type="button" id="resetStep2">Kategorie/Notizen zurücksetzen</button>
+          <button class="primary" type="button" id="toStep3" disabled>Weiter →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="card hidden" id="step3">
+      <div class="toprow">
+        <div class="section-title">
+          <h2>3) Abschluss: Übergabe / Kopieren / Mail</h2>
+          <span class="tag">Mailto + Copy + vCard Export</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-6">
+          <label for="handoffTo">Weitergeben an</label>
+          <input id="handoffTo" list="handoffOptions" placeholder="Auswahl klicken oder tippen…" />
+          <datalist id="handoffOptions">
+            <option value="Musikredaktion"></option>
+            <option value="Digital Signage"></option>
+            <option value="Vertrieb / Account"></option>
+            <option value="Buchhaltung"></option>
+            <option value="Geschäftsführung"></option>
+          </datalist>
+          <div class="hint">Auswahl wie früher „Zuständige Abteilung“, aber als „Weitergeben an“.</div>
+        </div>
+
+        <div class="col-6">
+          <label for="urgency">Dringlichkeit</label>
+          <select id="urgency">
+            <option value="">Bitte wählen …</option>
+            <option>Normal</option>
+            <option>Dringend</option>
+            <option>Sehr dringend / Ausfall</option>
+          </select>
+        </div>
+
+        <div class="col-6">
+          <label for="callback">Rückruf gewünscht?</label>
+          <select id="callback">
+            <option value="">Bitte wählen …</option>
+            <option>Nein</option>
+            <option>Ja</option>
+          </select>
+        </div>
+
+        <div class="col-6">
+          <label for="reachDate">Beste Erreichbarkeit – Tag</label>
+          <input id="reachDate" type="date" />
+        </div>
+
+        <div class="col-6">
+          <label for="reachTime">Beste Erreichbarkeit – Uhrzeit</label>
+          <select id="reachTime">
+            <option value="">Bitte wählen …</option>
+            <option>08:00</option><option>08:30</option>
+            <option>09:00</option><option>09:30</option>
+            <option>10:00</option><option>10:30</option>
+            <option>11:00</option><option>11:30</option>
+            <option>12:00</option><option>12:30</option>
+            <option>13:00</option><option>13:30</option>
+            <option>14:00</option><option>14:30</option>
+            <option>15:00</option><option>15:30</option>
+            <option>16:00</option><option>16:30</option>
+            <option>17:00</option><option>17:30</option>
+            <option>18:00</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label for="reachabilityText">Alternativ: Zeitfenster (Freitext)</label>
+          <input id="reachabilityText" placeholder="z. B. heute 14–16 Uhr / morgen Vormittag" />
+        </div>
+
+        <div class="col-12">
+          <label for="freeNotes">Zusätzliche Notizen (optional)</label>
+          <textarea id="freeNotes" placeholder="Alles Wichtige: Details, Namen, Zeiten, Besonderheiten …"></textarea>
+        </div>
+
+        <div class="col-6">
+          <label for="mailTo">E-Mail an (intern)</label>
+          <select id="mailTo">
+            <option value="">Bitte wählen …</option>
+            <option value="musikredaktion2@moodmusic.de">Burak – musikredaktion2@moodmusic.de</option>
+            <option value="musikredaktion1@moodmusic.de">Cecil – musikredaktion1@moodmusic.de</option>
+            <option value="tv@moodmusic.de">Thorsten – tv@moodmusic.de</option>
+            <option value="info@moodmusic.de">Sven – info@moodmusic.de</option>
+            <option value="support@moodmusic.de">Team – support@moodmusic.de</option>
+            <option value="buchhaltung@moodmusic.de">Buchhaltung – buchhaltung@moodmusic.de</option>
+          </select>
+        </div>
+
+        <div class="col-6">
+          <label for="mailSubject">Betreff (Mail)</label>
+          <input id="mailSubject" placeholder="z. B. Support-Anruf – Firma XY" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="btns">
+          <button type="button" id="backTo2">← Zurück</button>
+        </div>
+        <div class="btns">
+          <button type="button" id="buildSummary">Zusammenfassung aktualisieren</button>
+          <button class="success" type="button" id="copySummary">Kopieren</button>
+          <button class="primary" type="button" id="sendMail">Mail senden</button>
+          <button type="button" id="exportVcard">vCard exportieren</button>
+          <button class="danger" type="button" id="newCall3">Neuer Anruf</button>
+        </div>
+      </div>
+
+      <div id="summaryBox" class="summaryBox"></div>
+      <div class="hint" id="copyHint"></div>
+    </section>
+  </div>
+
+<script>
+  const STORAGE_KEY = "moodmusic_call_wizard_v3";
+
+  const state = {
+    step: 1,
+    base: { callerName:"", company:"", phone:"", email:"", position:"", site:"", reachDate:"", reachTime:"", reachabilityText:"" },
+    category: "",
+    answers: {},
+    meta: { handoffTo:"", urgency:"", callback:"", freeNotes:"", mailTo:"", mailSubject:"" }
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const step1 = $("step1");
+  const step2 = $("step2");
+  const step3 = $("step3");
+  const progress = $("progress");
+
+  function save(){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){} }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      const parsed = JSON.parse(raw);
+      if(parsed && typeof parsed === "object") Object.assign(state, parsed);
+    }catch(e){}
+  }
+
+  function setStep(n){
+    state.step = n;
+    step1.classList.toggle("hidden", n !== 1);
+    step2.classList.toggle("hidden", n !== 2);
+    step3.classList.toggle("hidden", n !== 3);
+
+    [...progress.querySelectorAll(".pill")].forEach(p => {
+      const s = Number(p.dataset.step);
+      p.classList.toggle("active", s === n);
+      p.classList.toggle("done", s < n);
+    });
+
+    if(n === 3) buildSummary();
+    save();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function val(id){ return ($(id)?.value ?? "").trim(); }
+
+  const categoryContent = {
+    A: { title: "Technisches Problem",
+      questions: [
+        { id:"a1", q:"Was funktioniert aktuell nicht?", placeholder:"z. B. keine Musik / Player offline / Login geht nicht" },
+        { id:"a2", q:"Seit wann besteht das Problem?", placeholder:"z. B. seit heute Morgen / seit gestern" },
+        { id:"a3", q:"Betrifft es ein bestimmtes Gerät oder den ganzen Standort?", placeholder:"z. B. nur Theke / komplett" },
+        { id:"a4", q:"Gab es kürzlich Änderungen (Internet, Strom, Umbau)?", placeholder:"z. B. Router gewechselt / Stromausfall" },
+        { id:"a5", q:"Dringlichkeit / Auswirkung?", placeholder:"z. B. komplette Störung / nur seltene Aussetzer" }
+      ],
+      extraHint: "Wenn nicht sofort lösbar: Rückruf-Zeitfenster + Ansprechpartner notieren."
+    },
+    B: { title: "Rechnung / Vertrag / Abrechnung",
+      questions: [
+        { id:"b1", q:"Geht es um eine bestimmte Rechnung oder allgemein?", placeholder:"z. B. Rechnung vom 12.01.2026 / allgemein" },
+        { id:"b2", q:"Haben Sie eine Rechnungsnummer oder ein Datum?", placeholder:"Rechnungsnummer / Datum" },
+        { id:"b3", q:"Was genau ist unklar oder fehlerhaft?", placeholder:"z. B. Betrag stimmt nicht / Adresse / Mahnung" }
+      ],
+      extraHint: "Wenn vorhanden: Rechnung/Vertragsdaten aufnehmen, dann an Buchhaltung/Vertrieb weiterleiten."
+    },
+    C: { title: "Produkt / Musik / Playlist",
+      questions: [
+        { id:"c1", q:"Geht es um Musikauswahl, Lautstärke oder Genre?", placeholder:"z. B. Genre / Lautstärke / Playlist" },
+        { id:"c2", q:"Ist das dauerhaft oder nur zu bestimmten Zeiten?", placeholder:"z. B. abends zu laut / morgens passt nicht" },
+        { id:"c3", q:"Für welchen Standort ist das relevant?", placeholder:"Standort / Bereich" },
+        { id:"c4", q:"Was wäre die gewünschte Änderung?", placeholder:"z. B. mehr Chill / weniger Beats / Lautstärke -10%" }
+      ],
+      extraHint: "Wünsche konkret formulieren, dann an zuständige Stelle weitergeben."
+    },
+    D: { title: "Mit bestimmter Person sprechen",
+      questions: [
+        { id:"d1", q:"Mit wem möchten Sie sprechen?", placeholder:"Name/Abteilung" },
+        { id:"d2", q:"Worum geht es ungefähr?", placeholder:"Kurzbeschreibung zur Priorisierung" },
+        { id:"d3", q:"Ist es dringend?", placeholder:"Ja/Nein + warum" },
+        { id:"d4", q:"Wann wäre ein Rückruf passend?", placeholder:"Zeitfenster" }
+      ],
+      extraHint: "Immer notieren: mit wem wollte die Person sprechen / an wen geht die Info."
+    },
+
+    /* ===========================
+       GEÄNDERT: E) NUR FREITEXT
+       - keine Fragen
+       - nur ein Textfeld
+       =========================== */
+    E: { title: "Sonstiges / unklar",
+      questions: [
+        { id:"e_free", q:"Freitext", placeholder:"Anliegen bitte hier vollständig beschreiben …", type:"textarea" }
+      ],
+      extraHint: "Bitte Anliegen frei beschreiben."
+    }
+  };
+
+  const qaBox = $("qaBox");
+  const toStep3Btn = $("toStep3");
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function setCategory(cat){
+    state.category = cat;
+    state.answers = {};
+    [...document.querySelectorAll(".choice")].forEach(el => {
+      el.classList.toggle("active", el.dataset.cat === cat);
+    });
+    renderQuestions(cat);
+    toStep3Btn.disabled = false;
+  }
+
+  function renderQuestions(cat){
+    const cfg = categoryContent[cat];
+
+    qaBox.innerHTML = `
+      <h3>Fragenleitfaden – ${cfg.title}</h3>
+      <div class="hint">${cfg.extraHint || ""}</div>
+      ${cfg.questions.map(item => `
+        <div class="qline">
+          ${cat === "E" ? "" : `<div class="q">${item.q}</div>`}
+          ${
+            item.type === "textarea"
+              ? `<textarea data-qid="${item.id}" placeholder="${escapeHtml(item.placeholder || "")}">${escapeHtml(state.answers[item.id] || "")}</textarea>`
+              : `<input data-qid="${item.id}" placeholder="${escapeHtml(item.placeholder || "")}" value="${escapeHtml(state.answers[item.id] || "")}" />`
+          }
+        </div>
+      `).join("")}
+      ${
+        cat === "E"
+          ? ""
+          : `
+            <div class="qline">
+              <div class="q">Kurz-Anliegen in 1 Satz (für Übergabe)</div>
+              <input data-qid="oneLiner" placeholder="z. B. Musik ausgefallen seit 09:00, Standort Berlin Mitte" value="${escapeHtml(state.answers.oneLiner || "")}" />
+            </div>
+          `
+      }
+    `;
+
+    qaBox.querySelectorAll("[data-qid]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        state.answers[inp.dataset.qid] = inp.value.trim();
+      });
+    });
+  }
+
+  function formatReachability(){
+    const d = val("reachDate");
+    const t = val("reachTime");
+    const txt = val("reachabilityText");
+    const parts = [];
+    if(d) parts.push(d);
+    if(t) parts.push(t);
+    const dt = parts.join(" ");
+    if(dt && txt) return `${dt} · ${txt}`;
+    if(dt) return dt;
+    return txt;
+  }
+
+  function snapshotAllInputs(){
+    state.base.callerName = val("callerName");
+    state.base.company = val("company");
+    state.base.phone = val("phone");
+    state.base.email = val("email");
+    state.base.position = val("position");
+    state.base.site = val("site");
+
+    state.base.reachDate = val("reachDate");
+    state.base.reachTime = val("reachTime");
+    state.base.reachabilityText = val("reachabilityText");
+
+    state.meta.handoffTo = val("handoffTo");
+    state.meta.urgency = val("urgency");
+    state.meta.callback = val("callback");
+    state.meta.freeNotes = val("freeNotes");
+    state.meta.mailTo = $("mailTo")?.value || "";
+    state.meta.mailSubject = val("mailSubject");
+
+    save();
+  }
+
+  // Step 1 -> 2 (validates)
+  $("toStep2").addEventListener("click", () => {
+    snapshotAllInputs();
+    const hasIdentity = state.base.callerName && state.base.company;
+    const hasContact = state.base.phone || state.base.email;
+    if(!hasIdentity || !hasContact){
+      alert("Bitte mindestens Name + Firma sowie Telefon ODER E-Mail eintragen (oder auf „Überspringen“ klicken).");
+      return;
+    }
+    setStep(2);
+  });
+
+  // Step 1 -> 2 (skip)
+  $("skipTo2").addEventListener("click", () => { snapshotAllInputs(); setStep(2); });
+
+  // Step 1 -> 3 (only contact)
+  $("skipTo3").addEventListener("click", () => { snapshotAllInputs(); setStep(3); });
+
+  // Step 2 -> 3 (requires category)
+  $("toStep3").addEventListener("click", () => {
+    snapshotAllInputs();
+    if(!state.category){
+      alert("Bitte eine Kategorie auswählen.");
+      return;
+    }
+    setStep(3);
+  });
+
+  $("backTo1").addEventListener("click", () => { snapshotAllInputs(); setStep(1); });
+  $("backTo2").addEventListener("click", () => {
+    snapshotAllInputs();
+    if(!state.category) setStep(1);
+    else setStep(2);
+  });
+
+  $("categoryGrid").addEventListener("click", (e) => {
+    const choice = e.target.closest(".choice");
+    if(!choice) return;
+    setCategory(choice.dataset.cat);
+  });
+
+  // "bold-like" in mail via **text** (mailto-safe)
+  function fmtBoldLike(v){
+    const s = (v ?? "-").toString().trim();
+    if(!s) return "**-**";
+    return `**${s}**`;
+  }
+
+  function buildSummary(){
+    snapshotAllInputs();
+    const catTitle = state.category ? categoryContent[state.category].title : "";
+    const reach = formatReachability();
+
+    // Plain text (for copy)
+    const linesPlain = [];
+    linesPlain.push("SUPPORT-ANRUF – PROTOKOLL");
+    linesPlain.push("—".repeat(28));
+    linesPlain.push(`Name: ${state.base.callerName || "-"}`);
+    linesPlain.push(`Firma: ${state.base.company || "-"}`);
+    linesPlain.push(`Telefon: ${state.base.phone || "-"}`);
+    linesPlain.push(`E-Mail: ${state.base.email || "-"}`);
+    linesPlain.push(`Position: ${state.base.position || "-"}`);
+    linesPlain.push(`Standort: ${state.base.site || "-"}`);
+    linesPlain.push(`Erreichbarkeit: ${reach || "-"}`);
+    linesPlain.push("");
+    linesPlain.push(`Kategorie: ${state.category ? state.category + ") " + catTitle : "-"}`);
+    if(state.category !== "E"){
+      linesPlain.push(`Kurz-Anliegen: ${state.answers.oneLiner || "-"}`);
+    }
+    linesPlain.push("");
+    if(state.category){
+      const qs = categoryContent[state.category].questions;
+      linesPlain.push("Details:");
+      if(state.category === "E"){
+        linesPlain.push(`- ${state.answers.e_free ? state.answers.e_free : "-"}`);
+      }else{
+        for(const q of qs){
+          linesPlain.push(`- ${q.q} → ${state.answers[q.id] ? state.answers[q.id] : "-"}`);
+        }
+      }
+      linesPlain.push("");
+    }
+    linesPlain.push(`Weitergegeben an: ${state.meta.handoffTo || "-"}`);
+    linesPlain.push(`Dringlichkeit: ${state.meta.urgency || "-"}`);
+    linesPlain.push(`Rückruf: ${state.meta.callback || "-"}`);
+    if(state.meta.freeNotes){
+      linesPlain.push("");
+      linesPlain.push("Zusätzliche Notizen:");
+      linesPlain.push(state.meta.freeNotes);
+    }
+    state._summaryPlain = linesPlain.join("\n");
+
+    // Mail body (mailto-safe "bold-like")
+    const linesMail = [];
+    linesMail.push("SUPPORT-ANRUF – PROTOKOLL");
+    linesMail.push("—".repeat(28));
+    linesMail.push(`Name: ${fmtBoldLike(state.base.callerName || "-")}`);
+    linesMail.push(`Firma: ${fmtBoldLike(state.base.company || "-")}`);
+    linesMail.push(`Telefon: ${fmtBoldLike(state.base.phone || "-")}`);
+    linesMail.push(`E-Mail: ${fmtBoldLike(state.base.email || "-")}`);
+    linesMail.push(`Position: ${fmtBoldLike(state.base.position || "-")}`);
+    linesMail.push(`Standort: ${fmtBoldLike(state.base.site || "-")}`);
+    linesMail.push(`Erreichbarkeit: ${fmtBoldLike(reach || "-")}`);
+    linesMail.push("");
+    linesMail.push(`Kategorie: ${fmtBoldLike(state.category ? (state.category + ") " + catTitle) : "-")}`);
+    if(state.category !== "E"){
+      linesMail.push(`Kurz-Anliegen: ${fmtBoldLike(state.answers.oneLiner || "-")}`);
+    }
+    linesMail.push("");
+    if(state.category){
+      const qs = categoryContent[state.category].questions;
+      linesMail.push("Details:");
+      if(state.category === "E"){
+        linesMail.push(fmtBoldLike(state.answers.e_free || "-"));
+      }else{
+        for(const q of qs){
+          linesMail.push(`- ${q.q} → ${fmtBoldLike(state.answers[q.id] || "-")}`);
+        }
+      }
+      linesMail.push("");
+    }
+    linesMail.push(`Weitergegeben an: ${fmtBoldLike(state.meta.handoffTo || "-")}`);
+    linesMail.push(`Dringlichkeit: ${fmtBoldLike(state.meta.urgency || "-")}`);
+    linesMail.push(`Rückruf: ${fmtBoldLike(state.meta.callback || "-")}`);
+    if(state.meta.freeNotes){
+      linesMail.push("");
+      linesMail.push("Zusätzliche Notizen:");
+      linesMail.push(fmtBoldLike(state.meta.freeNotes));
+    }
+    state._summaryMail = linesMail.join("\n");
+
+    // HTML summary on screen (answers bold)
+    const htmlLines = [];
+    const line = (k,v) => `<div class="line"><span class="k">${escapeHtml(k)}:</span> <span class="v">${escapeHtml(v || "-")}</span></div>`;
+
+    htmlLines.push(line("Name", state.base.callerName));
+    htmlLines.push(line("Firma", state.base.company));
+    htmlLines.push(line("Telefon", state.base.phone));
+    htmlLines.push(line("E-Mail", state.base.email));
+    htmlLines.push(line("Position", state.base.position));
+    htmlLines.push(line("Standort", state.base.site));
+    htmlLines.push(line("Erreichbarkeit", reach));
+
+    htmlLines.push(`<div class="block"><h4>Anliegen</h4></div>`);
+    htmlLines.push(line("Kategorie", state.category ? (state.category + ") " + catTitle) : "-"));
+    if(state.category !== "E"){
+      htmlLines.push(line("Kurz-Anliegen", state.answers.oneLiner || "-"));
+    }
+
+    if(state.category){
+      const qs = categoryContent[state.category].questions;
+      htmlLines.push(`<div class="block"><h4>Details</h4></div>`);
+      if(state.category === "E"){
+        htmlLines.push(`<div class="line"><span class="v">${escapeHtml(state.answers.e_free || "-").replaceAll("\n","<br>")}</span></div>`);
+      }else{
+        for(const q of qs){
+          htmlLines.push(line(q.q, state.answers[q.id] || "-"));
+        }
+      }
+    }
+
+    htmlLines.push(`<div class="block"><h4>Übergabe</h4></div>`);
+    htmlLines.push(line("Weitergegeben an", state.meta.handoffTo));
+    htmlLines.push(line("Dringlichkeit", state.meta.urgency));
+    htmlLines.push(line("Rückruf", state.meta.callback));
+
+    if(state.meta.freeNotes){
+      htmlLines.push(`<div class="block"><h4>Zusätzliche Notizen</h4></div>`);
+      htmlLines.push(`<div class="line"><span class="v">${escapeHtml(state.meta.freeNotes).replaceAll("\n","<br>")}</span></div>`);
+    }
+
+    $("summaryBox").innerHTML = htmlLines.join("");
+
+    if(!val("mailSubject")){
+      $("mailSubject").value =
+        `Support-Anruf – ${state.base.company || "Kunde"} – ${state.answers.oneLiner ? state.answers.oneLiner.slice(0, 45) : ""}`.trim();
+    }
+  }
+
+  $("buildSummary").addEventListener("click", buildSummary);
+
+  $("copySummary").addEventListener("click", async () => {
+    buildSummary();
+    const text = state._summaryPlain || "";
+    try{
+      await navigator.clipboard.writeText(text);
+      $("copyHint").textContent = "✅ Kopiert.";
+    }catch(err){
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      $("copyHint").textContent = "✅ Kopiert (Fallback).";
+    }
+  });
+
+  // Mail senden (mailto)
+  $("sendMail").addEventListener("click", () => {
+    buildSummary();
+    const to = $("mailTo").value;
+    if(!to){
+      alert("Bitte eine Empfänger-E-Mail auswählen (intern).");
+      return;
+    }
+    const subject = val("mailSubject") || "Support-Anruf – Protokoll";
+    const body = state._summaryMail || state._summaryPlain || "";
+    const mailto =
+      "mailto:" + encodeURIComponent(to) +
+      "?subject=" + encodeURIComponent(subject) +
+      "&body=" + encodeURIComponent(body);
+    window.location.href = mailto;
+  });
+
+  // vCard Export (separat)
+  function vcardEscape(s){
+    return String(s || "")
+      .replaceAll("\\", "\\\\")
+      .replaceAll("\n", "\\n")
+      .replaceAll(";", "\\;")
+      .replaceAll(",", "\\,");
+  }
+
+  function buildVCard(){
+    const fullName = state.base.callerName || "";
+    const org = state.base.company || "";
+    const phone = state.base.phone || "";
+    const email = state.base.email || "";
+    const title = state.base.position || "";
+    const site = state.base.site || "";
+    const reach = formatReachability();
+
+    const parts = fullName.trim().split(/\s+/).filter(Boolean);
+    const first = parts.length ? parts[0] : "";
+    const last = parts.length > 1 ? parts.slice(1).join(" ") : "";
+
+    const noteBits = [];
+    if(site) noteBits.push(`Standort: ${site}`);
+    if(reach) noteBits.push(`Erreichbarkeit: ${reach}`);
+
+    let vcf = "";
+    vcf += "BEGIN:VCARD\r\n";
+    vcf += "VERSION:3.0\r\n";
+    vcf += `N:${vcardEscape(last)};${vcardEscape(first)};;;\r\n`;
+    vcf += `FN:${vcardEscape(fullName)}\r\n`;
+    if(org)   vcf += `ORG:${vcardEscape(org)}\r\n`;
+    if(title) vcf += `TITLE:${vcardEscape(title)}\r\n`;
+    if(phone) vcf += `TEL;TYPE=WORK,VOICE:${vcardEscape(phone)}\r\n`;
+    if(email) vcf += `EMAIL;TYPE=WORK:${vcardEscape(email)}\r\n`;
+    if(noteBits.length) vcf += `NOTE:${vcardEscape(noteBits.join(" | "))}\r\n`;
+    vcf += "END:VCARD\r\n";
+    return vcf;
+  }
+
+  function downloadVCard(){
+    buildSummary();
+    if(!state.base.callerName && !state.base.company){
+      alert("Für eine vCard bitte mindestens Name oder Firma eintragen.");
+      return;
+    }
+    const vcf = buildVCard();
+    const blob = new Blob([vcf], { type: "text/vcard;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const filename = (state.base.callerName || state.base.company || "kontakt")
+      .replaceAll(/[^\p{L}\p{N}_-]+/gu, "_")
+      .slice(0, 50);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${filename}.vcf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  $("exportVcard").addEventListener("click", downloadVCard);
+
+  // New call / Reset
+  function clearCurrent(){
+    state.step = 1;
+    state.base = { callerName:"", company:"", phone:"", email:"", position:"", site:"", reachDate:"", reachTime:"", reachabilityText:"" };
+    state.category = "";
+    state.answers = {};
+    state.meta = { handoffTo:"", urgency:"", callback:"", freeNotes:"", mailTo: state.meta.mailTo || "", mailSubject:"" };
+
+    ["callerName","company","phone","email","position","site","reachDate","reachTime","reachabilityText","handoffTo","urgency","callback","freeNotes","mailSubject"]
+      .forEach(id => { const el = $(id); if(el) el.value = ""; });
+
+    $("summaryBox").innerHTML = "";
+    $("copyHint").textContent = "";
+
+    [...document.querySelectorAll(".choice")].forEach(el => el.classList.remove("active"));
+    qaBox.innerHTML = `<h3>Fragenleitfaden (dynamisch)</h3><div class="hint">Wähle oben eine Kategorie.</div>`;
+    toStep3Btn.disabled = true;
+
+    save();
+    setStep(1);
+  }
+
+  $("newCall1").addEventListener("click", clearCurrent);
+  $("newCall3").addEventListener("click", clearCurrent);
+
+  $("resetStep2").addEventListener("click", () => {
+    state.category = "";
+    state.answers = {};
+    [...document.querySelectorAll(".choice")].forEach(el => el.classList.remove("active"));
+    qaBox.innerHTML = `<h3>Fragenleitfaden (dynamisch)</h3><div class="hint">Wähle oben eine Kategorie.</div>`;
+    toStep3Btn.disabled = true;
+    save();
+  });
+
+  // Restore
+  load();
+
+  $("callerName").value = state.base.callerName || "";
+  $("company").value = state.base.company || "";
+  $("phone").value = state.base.phone || "";
+  $("email").value = state.base.email || "";
+  $("position").value = state.base.position || "";
+  $("site").value = state.base.site || "";
+
+  $("reachDate").value = state.base.reachDate || "";
+  $("reachTime").value = state.base.reachTime || "";
+  $("reachabilityText").value = state.base.reachabilityText || "";
+
+  $("handoffTo").value = state.meta.handoffTo || "";
+  $("urgency").value = state.meta.urgency || "";
+  $("callback").value = state.meta.callback || "";
+  $("freeNotes").value = state.meta.freeNotes || "";
+  $("mailTo").value = state.meta.mailTo || "";
+  $("mailSubject").value = state.meta.mailSubject || "";
+
+  if(state.category){
+    [...document.querySelectorAll(".choice")].forEach(el => el.classList.toggle("active", el.dataset.cat === state.category));
+    renderQuestions(state.category);
+    toStep3Btn.disabled = false;
+  }
+
+  setStep(state.step || 1);
+</script>
+</body>
+</html>
